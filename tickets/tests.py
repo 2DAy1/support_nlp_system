@@ -80,12 +80,15 @@ class TicketRoutingServiceTests(TestCase):
                     department=department
                 )
 
+        self.department = Department.objects.get(name='Відділ авторизації')
+        self.category = Category.objects.get(name='Авторизація')
+
     def test_create_ticket(self):
         service = TicketRoutingService()
 
         ticket = service.create_ticket(
             title='Проблема з входом',
-            text='Не можу увійти в акаунт'
+            text='Не можу увійти в акаунт, забув пароль від особистого кабінету'
         )
 
         self.assertEqual(

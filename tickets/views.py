@@ -26,8 +26,7 @@ class TicketCreateView(CreateView):
 
         service.create_ticket(
             title=form.cleaned_data['title'],
-            text=form.cleaned_data['text'],
-            user=self.request.user if self.request.user.is_authenticated else None
+            text=form.cleaned_data['text']
         )
 
         return redirect(self.success_url)
