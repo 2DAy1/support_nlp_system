@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Support NLP System{% endblock %}</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #111827;
+        }
+
+        header {
+            background: #1f2937;
+            color: white;
+            padding: 24px 40px;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+        }
+
+        header p {
+            margin: 0;
+            color: #d1d5db;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        nav {
+            margin-bottom: 24px;
+        }
+
+        nav a {
+            margin-right: 16px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .button,
+        button {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 10px 16px;
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .ticket-card {
+            border: 1px solid #e5e7eb;
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            background: #fafafa;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #e5e7eb;
+            padding: 5px 9px;
+            border-radius: 5px;
+            margin: 4px 6px 4px 0;
+            font-size: 14px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            box-sizing: border-box;
+        }
+
+        label {
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+
+        th,
+        td {
+            border: 1px solid #e5e7eb;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #f3f4f6;
+        }
+
+        .muted {
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Support NLP System</h1>
+    <p>Система маршрутизації звернень служби підтримки з NLP-класифікацією</p>
+</header>
+
+<main>
+    <nav>
+        <a href="{% url 'ticket_list' %}">Список звернень</a>
+        <a href="{% url 'ticket_create' %}">Створити звернення</a>
+        <a href="{% url 'ticket_statistics' %}">Статистика</a>
+        <a href="/admin/">Адмінка</a>
+    </nav>
+
+    {% block content %}
+    {% endblock %}
+</main>
+</body>
+</html>

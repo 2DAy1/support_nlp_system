@@ -1,0 +1,69 @@
+{% extends 'tickets/base.html' %}
+
+{% block title %}Статистика{% endblock %}
+
+{% block content %}
+<h2>Статистика звернень</h2>
+
+<p><strong>Загальна кількість звернень:</strong> {{ total_tickets }}</p>
+
+<h3>Звернення за категоріями</h3>
+
+<table>
+    <tr>
+        <th>Категорія</th>
+        <th>Кількість</th>
+    </tr>
+
+    {% for item in tickets_by_category %}
+        <tr>
+            <td>{{ item.category__name|default:"Не визначено" }}</td>
+            <td>{{ item.count }}</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="2">Дані відсутні</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<h3>Звернення за відділами</h3>
+
+<table>
+    <tr>
+        <th>Відділ</th>
+        <th>Кількість</th>
+    </tr>
+
+    {% for item in tickets_by_department %}
+        <tr>
+            <td>{{ item.department__name|default:"Не визначено" }}</td>
+            <td>{{ item.count }}</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="2">Дані відсутні</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<h3>Звернення за статусами</h3>
+
+<table>
+    <tr>
+        <th>Статус</th>
+        <th>Кількість</th>
+    </tr>
+
+    {% for item in tickets_by_status %}
+        <tr>
+            <td>{{ item.status }}</td>
+            <td>{{ item.count }}</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="2">Дані відсутні</td>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}

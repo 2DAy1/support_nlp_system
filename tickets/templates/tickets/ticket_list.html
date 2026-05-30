@@ -1,0 +1,34 @@
+{% extends 'tickets/base.html' %}
+
+{% block title %}Список звернень{% endblock %}
+
+{% block content %}
+<h2>Список звернень</h2>
+
+<p>
+    <a class="button" href="{% url 'ticket_create' %}">Створити нове звернення</a>
+</p>
+
+{% for ticket in tickets %}
+    <div class="ticket-card">
+        <h3>
+            <a href="{% url 'ticket_detail' ticket.id %}">
+                {{ ticket.title }}
+            </a>
+        </h3>
+
+        <p>{{ ticket.text }}</p>
+
+        <p>
+            <span class="badge">Категорія: {{ ticket.category|default:"Не визначено" }}</span>
+            <span class="badge">Відділ: {{ ticket.department|default:"Не визначено" }}</span>
+            <span class="badge">Впевненість: {{ ticket.confidence }}%</span>
+            <span class="badge">Статус: {{ ticket.get_status_display }}</span>
+        </p>
+
+        <p class="muted">Створено: {{ ticket.created_at }}</p>
+    </div>
+{% empty %}
+    <p>Звернень поки немає.</p>
+{% endfor %}
+{% endblock %}

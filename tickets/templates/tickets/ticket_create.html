@@ -1,0 +1,14 @@
+{% extends 'tickets/base.html' %}
+
+{% block title %}Створити звернення{% endblock %}
+
+{% block content %}
+<h2>Створити звернення</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit">Надіслати звернення</button>
+</form>
+{% endblock %}

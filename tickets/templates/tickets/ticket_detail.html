@@ -1,0 +1,46 @@
+{% extends 'tickets/base.html' %}
+
+{% block title %}Деталі звернення{% endblock %}
+
+{% block content %}
+<h2>{{ ticket.title }}</h2>
+
+<p>{{ ticket.text }}</p>
+
+<p>
+    <span class="badge">Категорія: {{ ticket.category|default:"Не визначено" }}</span>
+    <span class="badge">Відділ: {{ ticket.department|default:"Не визначено" }}</span>
+    <span class="badge">Впевненість: {{ ticket.confidence }}%</span>
+    <span class="badge">Статус: {{ ticket.get_status_display }}</span>
+</p>
+
+<p class="muted">Створено: {{ ticket.created_at }}</p>
+
+<hr>
+
+<h3>Змінити статус</h3>
+
+<form method="post">
+    {% csrf_token %}
+    {{ status_form.as_p }}
+
+    <button type="submit">Зберегти статус</button>
+</form>
+
+<hr>
+
+<h3>Історія зміни статусів</h3>
+
+{% for item in history %}
+    <div class="ticket-card">
+        <p>
+            <strong>{{ item.old_status }}</strong>
+            →
+            <strong>{{ item.new_status }}</strong>
+        </p>
+        <p class="muted">{{ item.changed_at }}</p>
+    </div>
+{% empty %}
+    <p>Історія змін поки відсутня.</p>
+{% endfor %}
+{% endblock %}
