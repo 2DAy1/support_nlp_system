@@ -1,0 +1,14 @@
+{% extends 'tickets/base.html' %}
+
+{% block title %}Вхід{% endblock %}
+
+{% block content %}
+<h2>Вхід у систему</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit">Увійти</button>
+</form>
+{% endblock %}
