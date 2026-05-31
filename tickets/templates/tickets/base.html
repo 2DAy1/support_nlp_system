@@ -135,9 +135,10 @@
             {% csrf_token %}
             <button type="submit">Вийти</button>
         </form>
-    {% else %}
-        <a href="{% url 'login' %}">Увійти</a>
-    {% endif %}
+ {% else %}
+    <a href="{% url 'login' %}">Увійти</a>
+    <a href="{% url 'register' %}">Реєстрація</a>
+{% endif %}
 </nav>
 
     {% block content %}
