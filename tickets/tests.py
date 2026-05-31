@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
 
+from django.contrib.auth.models import User
+
 from tickets.models import (
     Category,
     Department,
@@ -83,13 +85,21 @@ class TicketRoutingServiceTests(TestCase):
         self.department = Department.objects.get(name='Відділ авторизації')
         self.category = Category.objects.get(name='Авторизація')
 
-    def test_create_ticket(self):
+    def test_create_ticket_with_user(self):
+        user = User.objects.create_user(
+            username='client',
+            password='testpass123'
+        )
+
         service = TicketRoutingService()
 
         ticket = service.create_ticket(
             title='Проблема з входом',
-            text='Не можу увійти в акаунт, забув пароль від особистого кабінету'
+            text='Не можу увійти в акаунт, забув пароль від особистого кабінету',
+            user=user
         )
+
+        self.assertEqual(ticket.user, user)
 
         self.assertEqual(
             ticket.category.name,
@@ -229,3 +239,27 @@ class TicketViewsTests(TestCase):
             response.status_code,
             200
         )
+
+    def test_authenticated_user_can_create_ticket(self):
+        user = User.objects.create_user(
+            username='client',
+            password='testpass123'
+        )
+
+        self.client.login(
+            username='client',
+            password='testpass123'
+        )
+
+        response = self.client.post(
+            reverse('ticket_create'),
+            {
+                'title': 'Проблема з входом',
+                'text': 'Не можу увійти в акаунт, забув пароль від особистого кабінету',
+            }
+        )
+
+        ticket = Ticket.objects.first()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(ticket.user, user)

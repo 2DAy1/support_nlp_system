@@ -11,7 +11,7 @@ class TicketRoutingService:
         self.classifier = TicketClassifier()
 
     @transaction.atomic
-    def create_ticket(self, title: str, text: str) -> Ticket:
+    def create_ticket(self, title: str, text: str, user=None) -> Ticket:
         result = self.classifier.classify(text)
 
         category_name = self._get_final_category_name(
@@ -22,6 +22,7 @@ class TicketRoutingService:
         category = self._get_category(category_name)
 
         return Ticket.objects.create(
+            user=user,
             title=title,
             text=text,
             category=category,

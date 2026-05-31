@@ -8,6 +8,7 @@
 <p>{{ ticket.text }}</p>
 
 <p>
+    <span class="badge">Автор: {{ ticket.user|default:"Гість" }}</span>
     <span class="badge">Категорія: {{ ticket.category|default:"Не визначено" }}</span>
     <span class="badge">Відділ: {{ ticket.department|default:"Не визначено" }}</span>
     <span class="badge">Впевненість: {{ ticket.confidence }}%</span>

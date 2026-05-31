@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class Department(models.Model):
@@ -38,6 +39,13 @@ class Ticket(models.Model):
         RESOLVED = 'resolved', 'Resolved'
         CLOSED = 'closed', 'Closed'
 
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='tickets',
+        null=True,
+        blank=True
+    )
     title = models.CharField(max_length=200)
     text = models.TextField()
     category = models.ForeignKey(

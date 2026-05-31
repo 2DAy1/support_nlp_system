@@ -24,13 +24,15 @@ class TicketCreateView(CreateView):
     def form_valid(self, form):
         service = TicketRoutingService()
 
+        user = self.request.user if self.request.user.is_authenticated else None
+
         service.create_ticket(
             title=form.cleaned_data['title'],
-            text=form.cleaned_data['text']
+            text=form.cleaned_data['text'],
+            user=user
         )
 
         return redirect(self.success_url)
-
 
 class TicketDetailView(DetailView):
     model = Ticket

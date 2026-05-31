@@ -21,6 +21,7 @@ class TicketAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'title',
+        'user',
         'category',
         'department',
         'confidence',
@@ -28,7 +29,7 @@ class TicketAdmin(admin.ModelAdmin):
         'created_at',
     )
     list_filter = ('status', 'category', 'department')
-    search_fields = ('title', 'text')
+    search_fields = ('title', 'text', 'user__username')
     readonly_fields = ('created_at', 'updated_at')
 
 
