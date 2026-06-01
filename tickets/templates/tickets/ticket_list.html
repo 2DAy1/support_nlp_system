@@ -3,42 +3,73 @@
 {% block title %}Список звернень{% endblock %}
 
 {% block content %}
-<h2>Список звернень</h2>
+<h1 class="mb-4">
+Система маршрутизації звернень
+</h1>
 
 <p>
-    <a class="button" href="{% url 'ticket_create' %}">Створити нове звернення</a>
+Автоматична класифікація та маршрутизація через NLP.
 </p>
 
+<div class="row">
+
 {% for ticket in tickets %}
-    <div class="ticket-card">
-        <h3>
-            <a href="{% url 'ticket_detail' ticket.id %}">
-                {{ ticket.title }}
-            </a>
-        </h3>
 
-        <p>{{ ticket.text }}</p>
+<div class="col-md-6">
 
-        <p>
-            <span class="badge">Автор: {{ ticket.user|default:"Гість" }}</span>
-            <span class="badge">Категорія: {{ ticket.category|default:"Не визначено" }}</span>
-            <span class="badge">Відділ: {{ ticket.department|default:"Не визначено" }}</span>
-            <span class="badge">Впевненість: {{ ticket.confidence }}%</span>
-            <span class="badge">Статус: {{ ticket.get_status_display }}</span>
-        </p>
+<div class="card mb-3">
 
-        <p class="muted">Створено: {{ ticket.created_at }}</p>
-    </div>
+<div class="card-body">
+
+<h5>
+
+<a href="{% url 'ticket_detail' ticket.id %}">
+{{ ticket.title }}
+</a>
+
+</h5>
+
+<p>
+
+Категорія:
+{{ ticket.category }}
+
+</p>
+
+<p>
+
+Відділ:
+{{ ticket.department }}
+
+</p>
+
+<p>
+
+Статус:
+{{ ticket.get_status_display }}
+
+</p>
+
+<p>
+
+Впевненість:
+{{ ticket.confidence }}%
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
 {% empty %}
-    {% if request.user.is_authenticated %}
-        <p>Звернень поки немає.</p>
-    {% else %}
-        <p>
-            Щоб переглянути або створити звернення,
-            <a href="{% url 'login' %}">увійдіть у систему</a>
-            або
-            <a href="{% url 'register' %}">зареєструйтеся</a>.
-        </p>
-    {% endif %}
+
+<p>
+Звернень немає
+</p>
+
 {% endfor %}
+
+</div>
 {% endblock %}
