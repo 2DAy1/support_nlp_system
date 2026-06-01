@@ -5,7 +5,7 @@ from tickets.services.classifier import TicketClassifier
 
 
 class TicketRoutingService:
-    MIN_CONFIDENCE = 40
+    MIN_CONFIDENCE = 25
 
     def __init__(self):
         self.classifier = TicketClassifier()
