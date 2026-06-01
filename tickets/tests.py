@@ -181,6 +181,10 @@ class TicketViewsTests(TestCase):
             'Консультаційний відділ': ['Консультація'],
             'Загальний відділ підтримки': ['Інше'],
         }
+        self.user = User.objects.create_user(
+            username='client',
+            password='testpass123'
+        )
 
         for department_name, category_names in departments_data.items():
             department = Department.objects.create(name=department_name)
@@ -201,17 +205,17 @@ class TicketViewsTests(TestCase):
             200
         )
 
-    def test_ticket_create_page(self):
-        response = self.client.get(
-            reverse('ticket_create')
-        )
+    def test_ticket_create_page_requires_login(self):
+        response = self.client.get(reverse('ticket_create'))
 
-        self.assertEqual(
-            response.status_code,
-            200
-        )
+        self.assertEqual(response.status_code, 302)
 
     def test_ticket_can_be_created(self):
+        self.client.login(
+            username='client',
+            password='testpass123'
+        )
+
         response = self.client.post(
             reverse('ticket_create'),
             {
@@ -231,6 +235,11 @@ class TicketViewsTests(TestCase):
         )
 
     def test_statistics_page(self):
+        self.client.login(
+            username='client',
+            password='testpass123'
+        )
+
         response = self.client.get(
             reverse('ticket_statistics')
         )
@@ -241,10 +250,7 @@ class TicketViewsTests(TestCase):
         )
 
     def test_authenticated_user_can_create_ticket(self):
-        user = User.objects.create_user(
-            username='client',
-            password='testpass123'
-        )
+        user = self.user
 
         self.client.login(
             username='client',
@@ -263,3 +269,66 @@ class TicketViewsTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(ticket.user, user)
+
+    def test_authenticated_user_can_open_ticket_create_page(self):
+        self.client.login(
+            username='client',
+            password='testpass123'
+        )
+
+        response = self.client.get(reverse('ticket_create'))
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_regular_user_cannot_change_ticket_status(self):
+        ticket = TicketRoutingService().create_ticket(
+            title='Проблема з входом',
+            text='Не можу увійти в акаунт, забув пароль від особистого кабінету',
+            user=self.user
+        )
+
+        self.client.login(
+            username='client',
+            password='testpass123'
+        )
+
+        response = self.client.post(
+            reverse('ticket_detail', kwargs={'ticket_id': ticket.id}),
+            {
+                'status': Ticket.Status.IN_PROGRESS.value,
+            }
+        )
+
+        ticket.refresh_from_db()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(ticket.status, Ticket.Status.NEW)
+        self.assertEqual(TicketHistory.objects.count(), 0)
+
+    def test_staff_user_can_change_ticket_status(self):
+        staff_user = User.objects.create_user(
+            username='operator',
+            password='testpass123',
+            is_staff=True
+        )
+
+        ticket = TicketRoutingService().create_ticket(
+            title='Проблема з входом',
+            text='Не можу увійти в акаунт, забув пароль від особистого кабінету',
+            user=self.user
+        )
+
+        self.client.force_login(staff_user)
+
+        response = self.client.post(
+            reverse('ticket_detail', kwargs={'ticket_id': ticket.id}),
+            {
+                'status': Ticket.Status.IN_PROGRESS.value,
+            }
+        )
+
+        ticket.refresh_from_db()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(ticket.status, Ticket.Status.IN_PROGRESS.value)
+        self.assertEqual(TicketHistory.objects.count(), 1)

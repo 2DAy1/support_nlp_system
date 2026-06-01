@@ -30,6 +30,15 @@
         <p class="muted">Створено: {{ ticket.created_at }}</p>
     </div>
 {% empty %}
-    <p>Звернень поки немає.</p>
+    {% if request.user.is_authenticated %}
+        <p>Звернень поки немає.</p>
+    {% else %}
+        <p>
+            Щоб переглянути або створити звернення,
+            <a href="{% url 'login' %}">увійдіть у систему</a>
+            або
+            <a href="{% url 'register' %}">зареєструйтеся</a>.
+        </p>
+    {% endif %}
 {% endfor %}
 {% endblock %}

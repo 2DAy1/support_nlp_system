@@ -17,16 +17,18 @@
 
 <p class="muted">Створено: {{ ticket.created_at }}</p>
 
-<hr>
+{% if request.user.is_staff %}
+    <hr>
 
-<h3>Змінити статус</h3>
+    <h3>Змінити статус</h3>
 
-<form method="post">
-    {% csrf_token %}
-    {{ status_form.as_p }}
+    <form method="post">
+        {% csrf_token %}
+        {{ status_form.as_p }}
 
-    <button type="submit">Зберегти статус</button>
-</form>
+        <button type="submit">Зберегти статус</button>
+    </form>
+{% endif %}
 
 <hr>
 
