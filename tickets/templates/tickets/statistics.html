@@ -1,97 +1,138 @@
 {% extends 'tickets/base.html' %}
 
-{% block title %}Статистика{% endblock %}
+{% block title %}
+Статистика
+{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Статистика звернень</h1>
 
-<div class="alert alert-primary">
-    <strong>Загальна кількість звернень:</strong> {{ total_tickets }}
+<h1 class="mb-4">
+    Статистика звернень
+</h1>
+
+<div class="alert alert-primary mb-4">
+    <strong>Загальна кількість звернень:</strong>
+    {{ total_tickets }}
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header">
-                Звернення за категоріями
-            </div>
-
-            <div class="card-body">
-                <table class="table table-bordered table-striped">
-                    <tr>
-                        <th>Категорія</th>
-                        <th>Кількість</th>
-                    </tr>
-
-                    {% for item in tickets_by_category %}
-                        <tr>
-                            <td>{{ item.category__name|default:"Не визначено" }}</td>
-                            <td>{{ item.count }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="2">Дані відсутні</td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
+<div class="card mb-4 shadow-sm">
+    <div class="card-header">
+        Звернення за категоріями
     </div>
 
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header">
-                Звернення за відділами
-            </div>
+    <div class="card-body">
+        <table class="table table-bordered table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Категорія</th>
+                    <th style="width: 150px;">Кількість</th>
+                </tr>
+            </thead>
 
-            <div class="card-body">
-                <table class="table table-bordered table-striped">
+            <tbody>
+                {% for item in tickets_by_category %}
                     <tr>
-                        <th>Відділ</th>
-                        <th>Кількість</th>
+                        <td>{{ item.category__name|default:"Не визначено" }}</td>
+                        <td>{{ item.count }}</td>
                     </tr>
-
-                    {% for item in tickets_by_department %}
-                        <tr>
-                            <td>{{ item.department__name|default:"Не визначено" }}</td>
-                            <td>{{ item.count }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="2">Дані відсутні</td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header">
-                Звернення за статусами
-            </div>
-
-            <div class="card-body">
-                <table class="table table-bordered table-striped">
+                {% empty %}
                     <tr>
-                        <th>Статус</th>
-                        <th>Кількість</th>
+                        <td colspan="2">Дані відсутні</td>
                     </tr>
-
-                    {% for item in tickets_by_status %}
-                        <tr>
-                            <td>{{ item.status }}</td>
-                            <td>{{ item.count }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="2">Дані відсутні</td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-header">
+        Звернення за відділами
+    </div>
+
+    <div class="card-body">
+        <table class="table table-bordered table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Відділ</th>
+                    <th style="width: 150px;">Кількість</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in tickets_by_department %}
+                    <tr>
+                        <td>{{ item.department__name|default:"Не визначено" }}</td>
+                        <td>{{ item.count }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2">Дані відсутні</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-header">
+        Звернення за джерелами
+    </div>
+
+    <div class="card-body">
+        <table class="table table-bordered table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Джерело</th>
+                    <th style="width: 150px;">Кількість</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in tickets_by_source %}
+                    <tr>
+                        <td>{{ item.source__name|default:"Не визначено" }}</td>
+                        <td>{{ item.count }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2">Дані відсутні</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-header">
+        Звернення за статусами
+    </div>
+
+    <div class="card-body">
+        <table class="table table-bordered table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Статус</th>
+                    <th style="width: 150px;">Кількість</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in tickets_by_status %}
+                    <tr>
+                        <td>{{ item.status }}</td>
+                        <td>{{ item.count }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2">Дані відсутні</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
 {% endblock %}

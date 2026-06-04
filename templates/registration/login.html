@@ -1,19 +1,53 @@
 {% extends 'tickets/base.html' %}
 
-{% block title %}Вхід{% endblock %}
+{% block title %}
+Вхід
+{% endblock %}
 
 {% block content %}
-<h2>Вхід у систему</h2>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+<div class="row justify-content-center">
 
-    <button type="submit">Увійти</button>
-</form>
+    <div class="col-md-5">
 
-<p>
-    Немає акаунта?
-    <a href="{% url 'register' %}">Зареєструватися</a>
-</p>
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <h2 class="mb-4 text-center">
+                    Вхід у систему
+                </h2>
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    {{ form.as_p }}
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary w-100"
+                    >
+                        Увійти
+                    </button>
+
+                </form>
+
+                <hr>
+
+                <p class="text-center mb-0">
+                    Немає акаунта?
+                    <a href="{% url 'register' %}">
+                        Зареєструватися
+                    </a>
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
 {% endblock %}

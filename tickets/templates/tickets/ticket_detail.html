@@ -1,49 +1,271 @@
 {% extends 'tickets/base.html' %}
 
-{% block title %}Деталі звернення{% endblock %}
+{% block title %}
+Деталі звернення
+{% endblock %}
 
 {% block content %}
-<h2>{{ ticket.title }}</h2>
 
-<p>{{ ticket.text }}</p>
+<div class="mb-4">
+    <a href="{% url 'ticket_list' %}" class="btn btn-outline-secondary">
+        ← Назад до списку
+    </a>
+</div>
 
-<p>
-    <span class="badge">Автор: {{ ticket.user|default:"Гість" }}</span>
-    <span class="badge">Категорія: {{ ticket.category|default:"Не визначено" }}</span>
-    <span class="badge">Відділ: {{ ticket.department|default:"Не визначено" }}</span>
-    <span class="badge">Впевненість: {{ ticket.confidence }}%</span>
-    <span class="badge">Статус: {{ ticket.get_status_display }}</span>
-</p>
+<div class="card shadow-sm mb-4">
 
-<p class="muted">Створено: {{ ticket.created_at }}</p>
+    <div class="card-header">
+        <h2 class="mb-0">
+            {{ ticket.title }}
+        </h2>
+    </div>
 
-{% if request.user.is_staff %}
-    <hr>
+    <div class="card-body">
 
-    <h3>Змінити статус</h3>
+        <p>
+            {{ ticket.text }}
+        </p>
 
-    <form method="post">
+        <hr>
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <p>
+                    <strong>Компанія:</strong>
+                    {{ ticket.company.name }}
+                </p>
+
+                <p>
+                    <strong>Джерело:</strong>
+                    {{ ticket.source.name|default:"Не визначено" }}
+                </p>
+
+                <p>
+                    <strong>External ID:</strong>
+                    {{ ticket.external_id|default:"—" }}
+                </p>
+
+                <p>
+                    <strong>Автор звернення:</strong>
+                    {{ ticket.author_name|default:"—" }}
+                </p>
+
+                <p>
+                    <strong>Email автора:</strong>
+                    {{ ticket.author_email|default:"—" }}
+                </p>
+
+                <p>
+                    <strong>Оцінка:</strong>
+                    {% if ticket.rating %}
+                        {{ ticket.rating }}/5
+                    {% else %}
+                        —
+                    {% endif %}
+                </p>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <p>
+                    <strong>Категорія:</strong>
+                    {{ ticket.category.name|default:"Не визначено" }}
+                </p>
+
+                <p>
+                    <strong>Відділ:</strong>
+                    {{ ticket.department.name|default:"Не визначено" }}
+                </p>
+
+                <p>
+                    <strong>Впевненість класифікації:</strong>
+                    {{ ticket.confidence|floatformat:2 }}%
+                </p>
+
+                <p>
+                    <strong>Статус:</strong>
+                    {{ ticket.get_status_display }}
+                </p>
+
+                <p>
+                    <strong>Створено:</strong>
+                    {{ ticket.created_at|date:"d.m.Y H:i" }}
+                </p>
+
+                <p>
+                    <strong>Оновлено:</strong>
+                    {{ ticket.updated_at|date:"d.m.Y H:i" }}
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+        Зміна статусу
+    </div>
+
+    <div class="card-body">
+
+       <form method="post">
         {% csrf_token %}
+
+        <input
+            type="hidden"
+            name="action"
+            value="update_status"
+        >
+
         {{ status_form.as_p }}
 
-        <button type="submit">Зберегти статус</button>
+        <button type="submit" class="btn btn-primary">
+            Зберегти статус
+        </button>
     </form>
-{% endif %}
 
-<hr>
-
-<h3>Історія зміни статусів</h3>
-
-{% for item in history %}
-    <div class="ticket-card">
-        <p>
-            <strong>{{ item.old_status }}</strong>
-            →
-            <strong>{{ item.new_status }}</strong>
-        </p>
-        <p class="muted">{{ item.changed_at }}</p>
     </div>
-{% empty %}
-    <p>Історія змін поки відсутня.</p>
-{% endfor %}
+
+</div>
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+        Додати коментар
+    </div>
+
+    <div class="card-body">
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="action"
+                value="add_comment"
+            >
+
+            {{ comment_form.as_p }}
+
+            <button type="submit" class="btn btn-success">
+                Додати коментар
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+        Коментарі менеджерів
+    </div>
+
+    <div class="card-body">
+
+        {% if comments %}
+
+            {% for comment in comments %}
+
+                <div class="border rounded p-3 mb-3">
+
+                    <div class="d-flex justify-content-between">
+
+                        <strong>
+                            {{ comment.author.username|default:"Система" }}
+                        </strong>
+
+                        <span class="text-muted">
+                            {{ comment.created_at|date:"d.m.Y H:i" }}
+                        </span>
+
+                    </div>
+
+                    <p class="mb-1 mt-2">
+                        {{ comment.text }}
+                    </p>
+
+                    {% if comment.is_internal %}
+                        <span class="badge bg-secondary">
+                            Внутрішній коментар
+                        </span>
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p class="text-muted mb-0">
+                Коментарів поки немає.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+        Історія змін статусу
+    </div>
+
+    <div class="card-body">
+
+        {% if history %}
+
+            <table class="table table-bordered table-striped mb-0">
+
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Було</th>
+                        <th>Стало</th>
+                        <th>Користувач</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for item in history %}
+
+                        <tr>
+                            <td>{{ item.changed_at|date:"d.m.Y H:i" }}</td>
+                            <td>{{ item.old_status }}</td>
+                            <td>{{ item.new_status }}</td>
+                            <td>{{ item.changed_by.username|default:"—" }}</td>
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        {% else %}
+
+            <p class="text-muted mb-0">
+                Історія змін відсутня.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
 {% endblock %}

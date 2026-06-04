@@ -332,3 +332,15 @@ class TicketViewsTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(ticket.status, Ticket.Status.IN_PROGRESS.value)
         self.assertEqual(TicketHistory.objects.count(), 1)
+
+def test_classify_api_returns_category(self):
+    response = self.client.post(
+        reverse('api_classify_ticket'),
+        data='{"text": "Не можу увійти в акаунт, забув пароль"}',
+        content_type='application/json'
+    )
+
+    self.assertEqual(response.status_code, 200)
+    self.assertIn('category', response.json())
+    self.assertIn('department', response.json())
+    self.assertIn('confidence', response.json())

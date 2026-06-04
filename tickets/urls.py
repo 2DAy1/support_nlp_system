@@ -1,6 +1,7 @@
 from django.urls import path
 
 from tickets.views import (
+    DashboardView,
     TicketCreateView,
     TicketDetailView,
     TicketListView,
@@ -9,8 +10,13 @@ from tickets.views import (
 
 
 urlpatterns = [
-    path('', TicketListView.as_view(), name='ticket_list'),
+    path('', DashboardView.as_view(), name='dashboard'),
+    path('tickets/', TicketListView.as_view(), name='ticket_list'),
     path('create/', TicketCreateView.as_view(), name='ticket_create'),
-    path('statistics/', TicketStatisticsView.as_view(), name='ticket_statistics'),
-    path('tickets/<int:ticket_id>/', TicketDetailView.as_view(), name='ticket_detail'),
+    path(
+        'tickets/<int:ticket_id>/',
+        TicketDetailView.as_view(),
+        name='ticket_detail'
+    ),
+    path('statistics/', TicketStatisticsView.as_view(), name='statistics'),
 ]

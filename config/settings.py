@@ -105,7 +105,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'uk'
 
 TIME_ZONE = 'UTC'
 
@@ -121,3 +121,15 @@ STATIC_URL = 'static/'
 LOGIN_REDIRECT_URL = 'ticket_list'
 LOGOUT_REDIRECT_URL = 'ticket_list'
 LOGIN_URL = 'login'
+
+EMAIL_BACKEND = (
+'django.core.mail.backends.console.EmailBackend'
+)
+
+DEFAULT_FROM_EMAIL = (
+'support@supportnlp.local'
+)
+
+MANAGER_EMAIL = (
+'manager@supportnlp.local'
+)

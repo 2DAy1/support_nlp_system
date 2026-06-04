@@ -1,75 +1,247 @@
 {% extends 'tickets/base.html' %}
 
-{% block title %}Список звернень{% endblock %}
+{% block title %}
+Звернення
+{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">
-Система маршрутизації звернень
-</h1>
 
-<p>
-Автоматична класифікація та маршрутизація через NLP.
-</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">
+            Звернення компанії
+        </h1>
+
+        <p class="text-muted mb-0">
+            Автоматична класифікація та маршрутизація клієнтських звернень.
+        </p>
+    </div>
+
+    <a href="{% url 'ticket_create' %}" class="btn btn-primary">
+        Додати вручну
+    </a>
+</div>
+
+<form method="get" class="card p-3 mb-4">
 
 <div class="row">
 
-{% for ticket in tickets %}
-
-<div class="col-md-6">
-
-<div class="card mb-3">
-
-<div class="card-body">
-
-<h5>
-
-<a href="{% url 'ticket_detail' ticket.id %}">
-{{ ticket.title }}
-</a>
-
-</h5>
-
-<p>
-
-Категорія:
-{{ ticket.category }}
-
-</p>
-
-<p>
-
-Відділ:
-{{ ticket.department }}
-
-</p>
-
-<p>
-
-Статус:
-{{ ticket.get_status_display }}
-
-</p>
-
-<p>
-
-Впевненість:
-{{ ticket.confidence }}%
-
-</p>
-
+<div class="col">
+<input
+name="q"
+class="form-control"
+placeholder="Пошук"
+value="{{ request.GET.q }}"
+>
 </div>
 
-</div>
+<div class="col">
 
-</div>
+<select
+name="status"
+class="form-select"
+>
 
-{% empty %}
+<option value="">
+Статус
+</option>
 
-<p>
-Звернень немає
-</p>
+{% for value,label in statuses %}
+
+<option
+value="{{ value }}"
+{% if request.GET.status == value %}
+selected
+{% endif %}
+>
+
+{{ label }}
+
+</option>
 
 {% endfor %}
 
+</select>
+
 </div>
+
+<div class="col">
+
+<select
+name="category"
+class="form-select"
+>
+
+<option value="">
+Категорія
+</option>
+
+{% for item in categories %}
+
+<option
+value="{{ item.id }}"
+>
+
+{{ item.name }}
+
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+<div class="col">
+
+<select
+name="department"
+class="form-select"
+>
+
+<option value="">
+Відділ
+</option>
+
+{% for item in departments %}
+
+<option value="{{ item.id }}">
+{{ item.name }}
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+<div class="col">
+
+<select
+name="source"
+class="form-select"
+>
+
+<option value="">
+Джерело
+</option>
+
+{% for item in sources %}
+
+<option value="{{ item.id }}">
+{{ item.name }}
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+<div class="col-auto">
+
+<button
+class="btn btn-primary"
+>
+
+Фільтр
+
+</button>
+
+</div>
+
+</div>
+
+</form>
+
+{% if tickets %}
+
+    <div class="row">
+
+        {% for ticket in tickets %}
+
+            <div class="col-md-6 mb-4">
+
+                <div class="card h-100 shadow-sm">
+
+                    <div class="card-body">
+
+                        <h5 class="card-title">
+                            <a href="{% url 'ticket_detail' ticket.id %}">
+                                {{ ticket.title }}
+                            </a>
+                        </h5>
+
+                        <p class="text-muted mb-2">
+                            {{ ticket.text|truncatechars:120 }}
+                        </p>
+
+                        <div class="mb-2">
+                            <span class="badge bg-secondary">
+                                Компанія: {{ ticket.company.name }}
+                            </span>
+
+                            {% if ticket.source %}
+                                <span class="badge bg-info text-dark">
+                                    Джерело: {{ ticket.source.name }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-2">
+                            <span class="badge bg-primary">
+                                Категорія: {{ ticket.category.name|default:"Не визначено" }}
+                            </span>
+
+                            <span class="badge bg-dark">
+                                Відділ: {{ ticket.department.name|default:"Не визначено" }}
+                            </span>
+                        </div>
+
+                        <div class="mb-2">
+                            <span class="badge bg-warning text-dark">
+                                Статус: {{ ticket.get_status_display }}
+                            </span>
+
+                            <span class="badge bg-light text-dark">
+                                Впевненість: {{ ticket.confidence|floatformat:2 }}%
+                            </span>
+                        </div>
+
+                        {% if ticket.author_name %}
+                            <p class="mb-1">
+                                <strong>Автор:</strong>
+                                {{ ticket.author_name }}
+                            </p>
+                        {% endif %}
+
+                        {% if ticket.rating %}
+                            <p class="mb-0">
+                                <strong>Оцінка:</strong>
+                                {{ ticket.rating }}/5
+                            </p>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="card-footer text-muted">
+                        Створено: {{ ticket.created_at|date:"d.m.Y H:i" }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+{% else %}
+
+    <div class="alert alert-info">
+        Звернень поки немає.
+    </div>
+
+{% endif %}
+
 {% endblock %}

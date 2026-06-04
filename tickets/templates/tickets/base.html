@@ -20,30 +20,46 @@
 href="{% url 'ticket_list' %}">
 Support NLP
 </a>
+<div class="d-flex gap-2">
 
-<div>
+    <a
+        href="{% url 'dashboard' %}"
+        class="btn btn-outline-light"
+    >
+        Головна
+    </a>
 
-<a
-class="btn btn-outline-light"
-href="{% url 'ticket_create' %}">
-Створити
-</a>
+    <a
+        href="{% url 'ticket_list' %}"
+        class="btn btn-outline-light"
+    >
+    Звернення
+    </a>
 
-<a
-class="btn btn-outline-light"
-href="{% url 'ticket_statistics' %}">
-Статистика
-</a>
+    <a
+        href="{% url 'ticket_create' %}"
+        class="btn btn-outline-light"
+    >
+        Створити
+    </a>
 
-{% if request.user.is_staff %}
+    <a
+        href="{% url 'statistics' %}"
+        class="btn btn-outline-light"
+    >
+        Статистика
+    </a>
 
-<a
-class="btn btn-warning"
-href="/admin/">
-Адміністрування
-</a>
+    {% if user.is_superuser %}
+        <a
+            href="/admin/"
+            class="btn btn-warning"
+        >
+            Адміністрування
+        </a>
+    {% endif %}
 
-{% endif %}
+</div>
 
 {% if request.user.is_authenticated %}
 
