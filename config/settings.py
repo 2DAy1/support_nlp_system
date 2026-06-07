@@ -20,11 +20,24 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def get_env_list(name, default=''):
+    value = os.getenv(name, default)
+
+    return [
+        item.strip()
+        for item in value.split(',')
+        if item.strip()
+    ]
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-f+^u($b*2l0(peucub@h4l=i$(@89!-#cn3h*71h7&&c7#bw!0'
+SECRET_KEY = os.getenv(
+    'SECRET_KEY',
+    'local-dev-secret-key',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv(
@@ -32,9 +45,14 @@ DEBUG = os.getenv(
     'True'
 ) == 'True'
 
-ALLOWED_HOSTS = [
-    '*'
-]
+ALLOWED_HOSTS = get_env_list(
+    'ALLOWED_HOSTS',
+    '127.0.0.1,localhost',
+)
+
+CSRF_TRUSTED_ORIGINS = get_env_list(
+    'CSRF_TRUSTED_ORIGINS',
+)
 
 
 # Application definition
@@ -88,31 +106,24 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-
-        'NAME': os.getenv(
-            'DB_NAME'
-        ),
-
-        'USER': os.getenv(
-            'DB_USER'
-        ),
-
-        'PASSWORD': os.getenv(
-            'DB_PASSWORD'
-        ),
-
-        'HOST': os.getenv(
-            'DB_HOST'
-        ),
-
-        'PORT': os.getenv(
-            'DB_PORT'
-        ),
+if os.getenv('DB_NAME'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': os.getenv('DB_PORT'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

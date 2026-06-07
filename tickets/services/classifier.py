@@ -44,7 +44,7 @@ class TicketClassifier:
         if not model_path.exists():
             raise FileNotFoundError(
                 f'Classifier model not found: {model_path}. '
-                f'Run: py manage.py train_classifier'
+                f'Run: python manage.py train_classifier'
             )
 
         return joblib.load(model_path)

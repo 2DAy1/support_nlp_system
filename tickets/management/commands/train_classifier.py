@@ -183,10 +183,12 @@ class Command(BaseCommand):
         )
 
         self.stdout.write(
-            classification_report(
-                y_test,
-                predictions,
-                zero_division=0,
+            self._safe_console_text(
+                classification_report(
+                    y_test,
+                    predictions,
+                    zero_division=0,
+                )
             )
         )
 
@@ -256,4 +258,14 @@ class Command(BaseCommand):
         return (
             texts,
             categories,
+        )
+
+    def _safe_console_text(self, text):
+        encoding = getattr(self.stdout._out, 'encoding', None) or 'utf-8'
+
+        return text.encode(
+            encoding,
+            errors='replace',
+        ).decode(
+            encoding,
         )
