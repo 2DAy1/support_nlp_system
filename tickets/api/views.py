@@ -1,42 +1,76 @@
-import json
-
-from django.http import JsonResponse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiTypes,
+    extend_schema,
+)
+from rest_framework import status
+from rest_framework.exceptions import ParseError
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from tickets.models import CompanyApiKey, Source
+from tickets.api.serializers import (
+    ClassifyRequestSerializer,
+    ClassifyResponseSerializer,
+    TicketCreateRequestSerializer,
+    TicketCreateResponseSerializer,
+)
 from tickets.services.routing import TicketRoutingService
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class TicketCreateApiView(View):
+class TicketCreateApiView(APIView):
     http_method_names = ['post']
 
+    @extend_schema(
+        summary='Create support ticket',
+        description=(
+            'Creates ticket from external source, classifies by NLP, '
+            'routes to department.'
+        ),
+        request=TicketCreateRequestSerializer,
+        parameters=[
+            OpenApiParameter(
+                name='X-API-Key',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.HEADER,
+                required=True,
+            ),
+        ],
+        responses={
+            201: OpenApiResponse(
+                response=TicketCreateResponseSerializer,
+                description='Ticket created.',
+            ),
+        },
+    )
     def post(self, request, *args, **kwargs):
         api_key = self._get_api_key(request)
 
         if api_key is None:
-            return JsonResponse(
+            return Response(
                 {'error': 'Invalid or missing API key.'},
-                status=401,
+                status=status.HTTP_401_UNAUTHORIZED,
             )
 
         data = self._parse_json(request)
 
         if data is None:
-            return JsonResponse(
+            return Response(
                 {'error': 'Invalid JSON body.'},
-                status=400,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         validation_error = self._validate_payload(data)
 
         if validation_error:
-            return JsonResponse(
+            return Response(
                 {'error': validation_error},
-                status=400,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         source = self._get_source(
@@ -61,7 +95,7 @@ class TicketCreateApiView(View):
         api_key.last_used_at = timezone.now()
         api_key.save(update_fields=['last_used_at'])
 
-        return JsonResponse(
+        return Response(
             {
                 'id': ticket.id,
                 'company': ticket.company.name,
@@ -76,7 +110,7 @@ class TicketCreateApiView(View):
                 'status': ticket.status,
                 'confidence': round(ticket.confidence, 2),
             },
-            status=201,
+            status=status.HTTP_201_CREATED,
         )
 
     def _get_api_key(self, request):
@@ -98,8 +132,8 @@ class TicketCreateApiView(View):
 
     def _parse_json(self, request):
         try:
-            return json.loads(request.body)
-        except json.JSONDecodeError:
+            return request.data
+        except ParseError:
             return None
 
     def _validate_payload(self, data):
@@ -138,16 +172,27 @@ class TicketCreateApiView(View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class ClassifyTicketApiView(View):
+class ClassifyTicketApiView(APIView):
     http_method_names = ['post']
 
+    @extend_schema(
+        summary='Classify ticket text',
+        description='Classifies text without creating ticket.',
+        request=ClassifyRequestSerializer,
+        responses={
+            200: OpenApiResponse(
+                response=ClassifyResponseSerializer,
+                description='Ticket text classified.',
+            ),
+        },
+    )
     def post(self, request, *args, **kwargs):
         data = self._parse_json(request)
 
         if data is None:
-            return JsonResponse(
+            return Response(
                 {'error': 'Invalid JSON body.'},
-                status=400,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         title = data.get('title', '')
@@ -155,15 +200,15 @@ class ClassifyTicketApiView(View):
         full_text = f'{title} {text}'.strip()
 
         if not full_text:
-            return JsonResponse(
+            return Response(
                 {'error': 'Field "title" or "text" is required.'},
-                status=400,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         service = TicketRoutingService()
         result = service.classifier.classify(full_text)
 
-        return JsonResponse(
+        return Response(
             {
                 'predicted_category': result.category_name,
                 'confidence': round(float(result.confidence), 2),
@@ -172,6 +217,6 @@ class ClassifyTicketApiView(View):
 
     def _parse_json(self, request):
         try:
-            return json.loads(request.body)
-        except json.JSONDecodeError:
+            return request.data
+        except ParseError:
             return None
