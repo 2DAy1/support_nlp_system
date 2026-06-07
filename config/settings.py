@@ -11,7 +11,11 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,9 +27,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-f+^u($b*2l0(peucub@h4l=i$(@89!-#cn3h*71h7&&c7#bw!0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv(
+    'DEBUG',
+    'True'
+) == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '*'
+]
 
 
 # Application definition
@@ -38,12 +47,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'rest_framework',
+    'drf_spectacular',
+
     'accounts',
     'tickets',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -77,11 +90,29 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+
+        'NAME': os.getenv(
+            'DB_NAME'
+        ),
+
+        'USER': os.getenv(
+            'DB_USER'
+        ),
+
+        'PASSWORD': os.getenv(
+            'DB_PASSWORD'
+        ),
+
+        'HOST': os.getenv(
+            'DB_HOST'
+        ),
+
+        'PORT': os.getenv(
+            'DB_PORT'
+        ),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -118,18 +149,35 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_STORAGE = (
+    'whitenoise.storage.'
+    'CompressedManifestStaticFilesStorage'
+)
+
 LOGIN_REDIRECT_URL = 'ticket_list'
 LOGOUT_REDIRECT_URL = 'ticket_list'
 LOGIN_URL = 'login'
 
 EMAIL_BACKEND = (
-'django.core.mail.backends.console.EmailBackend'
+    'django.core.mail.backends.console.EmailBackend'
 )
 
 DEFAULT_FROM_EMAIL = (
-'support@supportnlp.local'
+    'support@supportnlp.local'
 )
 
 MANAGER_EMAIL = (
-'manager@supportnlp.local'
+    'manager@supportnlp.local'
 )
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Support NLP API',
+    'DESCRIPTION': 'B2B system for automatic support ticket classification and routing.',
+    'VERSION': '1.0.0',
+}

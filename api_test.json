@@ -1,0 +1,9 @@
+﻿{
+  "source": "Website form",
+  "external_id": "api-test-authorization-001",
+  "author_name": "Іван Петренко",
+  "author_email": "ivan@example.com",
+  "rating": 2,
+  "title": "Не можу увійти",
+  "text": "Система не приймає пароль"
+}

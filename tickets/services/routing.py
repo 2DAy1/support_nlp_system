@@ -46,7 +46,7 @@ class TicketRoutingService:
             company=company
         )
 
-        return Ticket.objects.create(
+        ticket = Ticket.objects.create(
             company=company,
             source=source,
             created_by=created_by,
@@ -63,6 +63,30 @@ class TicketRoutingService:
             confidence=result.confidence,
         )
 
+        TicketHistory.objects.create(
+            ticket=ticket,
+            changed_by=created_by,
+            event_type=TicketHistory.EventType.CREATED,
+            new_status=ticket.status,
+            comment='Ticket created.'
+        )
+
+        TicketHistory.objects.create(
+            ticket=ticket,
+            changed_by=created_by,
+            event_type=TicketHistory.EventType.CLASSIFIED,
+            comment=f'Category: {ticket.category}. Confidence: {ticket.confidence:.2f}%.'
+        )
+
+        TicketHistory.objects.create(
+            ticket=ticket,
+            changed_by=created_by,
+            event_type=TicketHistory.EventType.ROUTED,
+            comment=f'Department: {ticket.department}.'
+        )
+
+        return ticket
+
     @transaction.atomic
     def update_status(
             self,
@@ -71,15 +95,9 @@ class TicketRoutingService:
             changed_by=None,
             comment: str = '',
     ) -> Ticket:
-        print('SERVICE CALLED')
-        print('SERVICE TICKET ID:', ticket.id)
-        print('SERVICE OLD STATUS:', ticket.status)
-        print('SERVICE NEW STATUS:', new_status)
-
         old_status = ticket.status
 
         if old_status == new_status:
-            print('STATUS NOT CHANGED')
             return ticket
 
         ticket.status = new_status
@@ -93,12 +111,11 @@ class TicketRoutingService:
         TicketHistory.objects.create(
             ticket=ticket,
             changed_by=changed_by,
+            event_type=TicketHistory.EventType.STATUS_CHANGED,
             old_status=old_status,
             new_status=new_status,
             comment=comment,
         )
-
-        print('SERVICE SAVED')
 
         return ticket
 

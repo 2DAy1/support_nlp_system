@@ -266,6 +266,15 @@ class Ticket(models.Model):
 
 
 class TicketHistory(models.Model):
+    class EventType(models.TextChoices):
+        CREATED = 'created', 'Created'
+        CLASSIFIED = 'classified', 'Classified'
+        ROUTED = 'routed', 'Routed'
+        ASSIGNED = 'assigned', 'Assigned'
+        STATUS_CHANGED = 'status_changed', 'Status Changed'
+        COMMENT_ADDED = 'comment_added', 'Comment Added'
+        CLOSED = 'closed', 'Closed'
+
     ticket = models.ForeignKey(
         Ticket,
         on_delete=models.CASCADE,
@@ -278,8 +287,22 @@ class TicketHistory(models.Model):
         null=True,
         blank=True
     )
-    old_status = models.CharField(max_length=20)
-    new_status = models.CharField(max_length=20)
+    event_type = models.CharField(
+        max_length=30,
+        choices=EventType.choices,
+        default=EventType.STATUS_CHANGED
+    )
+    old_status = models.CharField(
+        max_length=20,
+        choices=Ticket.Status.choices,
+        blank=True
+    )
+
+    new_status = models.CharField(
+        max_length=20,
+        choices=Ticket.Status.choices,
+        blank=True
+    )
     comment = models.TextField(blank=True)
     changed_at = models.DateTimeField(auto_now_add=True)
 
@@ -289,7 +312,7 @@ class TicketHistory(models.Model):
         verbose_name_plural = 'Ticket histories'
 
     def __str__(self):
-        return f'{self.ticket.title}: {self.old_status} -> {self.new_status}'
+        return f'{self.ticket.title}: {self.event_type}'
 
 
 class TicketComment(models.Model):

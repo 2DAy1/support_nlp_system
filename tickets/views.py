@@ -9,7 +9,7 @@ from tickets.forms import (
     TicketCreateForm,
     TicketStatusForm,
 )
-from tickets.models import Ticket
+from tickets.models import Ticket,TicketHistory
 from tickets.services.routing import TicketRoutingService
 
 
@@ -179,30 +179,28 @@ class TicketDetailView(CompanyAccessMixin, DetailView):
         return redirect('ticket_detail', ticket_id=ticket.id)
 
     def _update_ticket_status(self, request, ticket):
+        old_status = ticket.status
+        old_assigned_user = ticket.assigned_user
+
         form = TicketStatusForm(
             request.POST,
             instance=ticket,
         )
 
         if not form.is_valid():
-            print('FORM ERRORS:', form.errors)
             return
 
         new_status = form.cleaned_data['status']
         assigned_user = form.cleaned_data['assigned_user']
 
-        print('VIEW TICKET ID:', ticket.id)
-        print('VIEW OLD STATUS:', ticket.status)
-        print('VIEW NEW STATUS:', new_status)
+        ticket.status = old_status
 
         service = TicketRoutingService()
-        updated_ticket = service.update_status(
+        service.update_status(
             ticket=ticket,
             new_status=new_status,
             changed_by=request.user,
         )
-
-        print('AFTER SERVICE STATUS:', updated_ticket.status)
 
         ticket.assigned_user = assigned_user
         ticket.save(
@@ -211,6 +209,17 @@ class TicketDetailView(CompanyAccessMixin, DetailView):
                 'updated_at',
             ]
         )
+
+        if old_assigned_user != assigned_user:
+            TicketHistory.objects.create(
+                ticket=ticket,
+                changed_by=request.user,
+                event_type=TicketHistory.EventType.ASSIGNED,
+                comment=(
+                    f'Assigned user changed from '
+                    f'{old_assigned_user or "—"} to {assigned_user or "—"}.'
+                ),
+            )
 
     def _add_ticket_comment(self, request, ticket):
         form = TicketCommentForm(request.POST)
@@ -222,6 +231,13 @@ class TicketDetailView(CompanyAccessMixin, DetailView):
         comment.ticket = ticket
         comment.author = request.user
         comment.save()
+
+        TicketHistory.objects.create(
+            ticket=ticket,
+            changed_by=request.user,
+            event_type=TicketHistory.EventType.COMMENT_ADDED,
+            comment='Comment added.',
+        )
 
 
 class TicketStatisticsView(CompanyAccessMixin, TemplateView):

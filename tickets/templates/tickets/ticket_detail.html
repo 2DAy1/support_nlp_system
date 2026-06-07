@@ -220,51 +220,119 @@
 
 <div class="card shadow-sm">
 
+
     <div class="card-header">
-        Історія змін статусу
+        Історія обробки звернення
     </div>
 
     <div class="card-body">
 
         {% if history %}
 
-            <table class="table table-bordered table-striped mb-0">
+            {% for item in history %}
 
-                <thead>
-                    <tr>
-                        <th>Дата</th>
-                        <th>Було</th>
-                        <th>Стало</th>
-                        <th>Користувач</th>
-                    </tr>
-                </thead>
+                <div class="border rounded p-3 mb-3">
 
-                <tbody>
+                    <div class="d-flex justify-content-between">
 
-                    {% for item in history %}
+                        <div>
 
-                        <tr>
-                            <td>{{ item.changed_at|date:"d.m.Y H:i" }}</td>
-                            <td>{{ item.old_status }}</td>
-                            <td>{{ item.new_status }}</td>
-                            <td>{{ item.changed_by.username|default:"—" }}</td>
-                        </tr>
+                            <strong>
 
-                    {% endfor %}
+                                {% if item.event_type == 'created' %}
+                                    🟢 Створено
 
-                </tbody>
+                                {% elif item.event_type == 'classified' %}
+                                    🧠 NLP класифікація
 
-            </table>
+                                {% elif item.event_type == 'routed' %}
+                                    📨 Маршрутизація
+
+                                {% elif item.event_type == 'assigned' %}
+                                    👤 Призначення менеджера
+
+                                {% elif item.event_type == 'status_changed' %}
+                                    🔄 Зміна статусу
+
+                                {% elif item.event_type == 'comment_added' %}
+                                    💬 Додано коментар
+
+                                {% elif item.event_type == 'closed' %}
+                                    ✅ Закрито
+
+                                {% else %}
+                                    Подія
+
+                                {% endif %}
+
+                            </strong>
+
+                        </div>
+
+                        <small class="text-muted">
+
+                            {{ item.changed_at|date:"d.m.Y H:i" }}
+
+                        </small>
+
+                    </div>
+
+                    <div class="mt-2">
+
+                        {% if item.old_status or item.new_status %}
+
+                            <div>
+
+                               <strong>
+                        {{ item.get_old_status_display|default:item.old_status }}
+                    </strong>
+
+                    →
+
+                    <strong>
+                        {{ item.get_new_status_display|default:item.new_status }}
+                    </strong>
+
+                            </div>
+
+                        {% endif %}
+
+                        {% if item.comment %}
+
+                            <div class="mt-2">
+
+                                {{ item.comment }}
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <small class="text-muted">
+
+                        Автор:
+                        {{ item.changed_by.username|default:"Система" }}
+
+                    </small>
+
+                </div>
+
+            {% endfor %}
 
         {% else %}
 
-            <p class="text-muted mb-0">
-                Історія змін відсутня.
+            <p class="text-muted">
+
+                Історія поки відсутня.
+
             </p>
 
         {% endif %}
 
     </div>
+
+</div>
 
 </div>
 
