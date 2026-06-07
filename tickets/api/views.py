@@ -2,11 +2,11 @@ import json
 
 from django.http import JsonResponse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 
-from tickets.models import CompanyApiKey, Source, Ticket
+from tickets.models import CompanyApiKey, Source
 from tickets.services.routing import TicketRoutingService
 
 

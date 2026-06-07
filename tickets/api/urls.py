@@ -1,6 +1,6 @@
 from django.urls import path
 
-from tickets.api_views import ClassifyTicketApiView, TicketCreateApiView
+from tickets.api.views import ClassifyTicketApiView, TicketCreateApiView
 
 
 urlpatterns = [

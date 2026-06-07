@@ -35,6 +35,6 @@ urlpatterns = [
         name='swagger-ui',
     ),
 
-    path('api/', include('tickets.api_urls')),
+    path('api/', include('tickets.api.urls')),
     path('', include('tickets.urls')),
 ]
