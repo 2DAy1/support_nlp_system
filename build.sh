@@ -7,5 +7,5 @@ python manage.py collectstatic --noinput
 python manage.py migrate
 
 if [ "$SEED_DEMO_DATA" = "True" ]; then
-    python manage.py seed_demo_data
+    python manage.py seed_demo_data || true
 fi

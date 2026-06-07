@@ -194,13 +194,9 @@ Required Render environment variables:
 ```text
 SECRET_KEY
 DEBUG
+DATABASE_URL
 ALLOWED_HOSTS
 CSRF_TRUSTED_ORIGINS
-DB_NAME
-DB_USER
-DB_PASSWORD
-DB_HOST
-DB_PORT
 SEED_DEMO_DATA
 ```
 
@@ -209,11 +205,28 @@ Example production values:
 ```text
 DEBUG=False
 SEED_DEMO_DATA=True
+DATABASE_URL=postgresql://...
 ALLOWED_HOSTS=your-render-service.onrender.com
 CSRF_TRUSTED_ORIGINS=https://your-render-service.onrender.com
 ```
 
 `build.sh` installs dependencies, collects static files, runs migrations, and seeds demo data only when `SEED_DEMO_DATA=True`.
+
+For non-Docker Render deployment, create a Python Web Service and use:
+
+```bash
+bash build.sh
+```
+
+as the build command, and:
+
+```bash
+gunicorn config.wsgi:application
+```
+
+as the start command.
+
+Render PostgreSQL provides `DATABASE_URL`; the settings module uses that first. Local development can still use `DB_*` values for PostgreSQL, and falls back to SQLite when no database environment variables are set.
 
 ### Render Docker Deployment
 

@@ -1,5 +1,6 @@
 ﻿asgiref==3.11.1
 Django==6.0.5
+dj-database-url==3.0.1
 djangorestframework==3.17.1
 drf-spectacular==0.29.0
 gunicorn==26.0.0
@@ -8,6 +9,7 @@ numpy==2.4.6
 packaging==26.2
 psycopg==3.3.4
 psycopg-binary==3.3.4
+psycopg2-binary==2.9.11
 python-dotenv==1.2.2
 scikit-learn==1.8.0
 scipy==1.17.1
