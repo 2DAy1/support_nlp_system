@@ -127,6 +127,36 @@ Run the full test suite:
 python manage.py test
 ```
 
+## Docker Local Setup
+
+Docker Compose is provided for local development with a PostgreSQL container.
+
+```bash
+copy .env.docker.example .env.docker
+docker compose build
+docker compose up
+```
+
+On Linux or macOS, copy the Docker env file with:
+
+```bash
+cp .env.docker.example .env.docker
+```
+
+Local Docker uses the Compose service name for the database:
+
+```text
+DB_HOST=db
+```
+
+Normal local development without Docker should keep PostgreSQL on the host machine:
+
+```text
+DB_HOST=localhost
+```
+
+The Docker Compose `web` service runs migrations, collects static files, seeds demo data, and starts Gunicorn on port `8000`.
+
 ## NLP Model
 
 Training data is stored in `ml/data/training_data.csv`.
@@ -184,6 +214,27 @@ CSRF_TRUSTED_ORIGINS=https://your-render-service.onrender.com
 ```
 
 `build.sh` installs dependencies, collects static files, runs migrations, and seeds demo data only when `SEED_DEMO_DATA=True`.
+
+### Render Docker Deployment
+
+The project also includes a production Dockerfile for Render Docker deployment.
+
+Manual Render setup:
+
+1. Create a new Web Service.
+2. Select this repository.
+3. Choose Docker as the environment.
+4. Set Dockerfile path to `./Dockerfile`.
+5. Leave the start command empty; the Dockerfile `CMD` starts Gunicorn.
+6. Add the required environment variables manually.
+
+Render provides the `PORT` environment variable automatically. The Dockerfile binds Gunicorn to:
+
+```bash
+0.0.0.0:${PORT:-8000}
+```
+
+For Docker deployment on Render, use Render PostgreSQL values in the `DB_*` environment variables. Do not use `DB_HOST=db` on Render; that value is only for local Docker Compose.
 
 ## Static Files
 

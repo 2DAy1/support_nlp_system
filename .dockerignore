@@ -1,7 +1,10 @@
 .venv
-.idea
 .git
+.idea
 __pycache__
 *.pyc
 db.sqlite3
 .env
+.env.docker
+staticfiles
+.pytest_cache
